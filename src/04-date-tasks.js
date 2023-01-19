@@ -34,8 +34,8 @@ function parseDataFromRfc2822(value) {
  *    '2016-01-19T16:07:37+00:00'    => Date()
  *    '2016-01-19T08:07:37Z' => Date()
  */
-function parseDataFromIso8601(/* value */) {
-  throw new Error('Not implemented');
+function parseDataFromIso8601(value) {
+  return new Date(value);
 }
 
 
@@ -53,8 +53,10 @@ function parseDataFromIso8601(/* value */) {
  *    Date(2012,1,1)    => true
  *    Date(2015,1,1)    => false
  */
-function isLeapYear(/* date */) {
-  throw new Error('Not implemented');
+function isLeapYear(date) {
+  const year = date.getFullYear();
+  if (year % 100 === 0 && year % 400 !== 0) return false;
+  return year % 4 === 0;
 }
 
 
@@ -73,8 +75,22 @@ function isLeapYear(/* date */) {
  *    Date(2000,1,1,10,0,0),  Date(2000,1,1,10,0,0,250)     => "00:00:00.250"
  *    Date(2000,1,1,10,0,0),  Date(2000,1,1,15,20,10,453)   => "05:20:10.453"
  */
-function timeSpanToString(/* startDate, endDate */) {
-  throw new Error('Not implemented');
+function timeSpanToString(startDate, endDate) {
+  let msDiff = Math.abs(endDate.getTime() - startDate.getTime());
+  const hours = Math.floor(msDiff / 3600000);
+  const hoursString = hours < 10 ? `0${hours}` : `${hours}`;
+  msDiff %= 3600000;
+  const mins = Math.floor(msDiff / 60000);
+  const minsString = mins < 10 ? `0${mins}` : `${mins}`;
+  msDiff %= 60000;
+  const secs = Math.floor(msDiff / 1000);
+  const secString = secs < 10 ? `0${secs}` : `${secs}`;
+  const ms = msDiff % 1000;
+  let msString;
+  if (ms < 10) msString = `00${ms}`;
+  else if (ms < 100) msString = `0${ms}`;
+  else msString = `${ms}`;
+  return `${hoursString}:${minsString}:${secString}.${msString}`;
 }
 
 
@@ -94,8 +110,17 @@ function timeSpanToString(/* startDate, endDate */) {
  *    Date.UTC(2016,3,5,18, 0) => Math.PI
  *    Date.UTC(2016,3,5,21, 0) => Math.PI/2
  */
-function angleBetweenClockHands(/* date */) {
-  throw new Error('Not implemented');
+function angleBetweenClockHands(date) {
+  let hour = date.getUTCHours();
+  if (hour === 12) hour = 0;
+  if (hour > 12) hour -= 12;
+  let min = date.getUTCMinutes();
+  if (min === 60) { min = 0; hour += 1; }
+
+  const hourAngle = 0.5 * (hour * 60 + min);
+  const minAngle = 6 * min;
+  const clockAngle = Math.abs(hourAngle - minAngle);
+  return Math.abs(clockAngle > 180 ? 360 - clockAngle : clockAngle) * (Math.PI / 180);
 }
 
 
