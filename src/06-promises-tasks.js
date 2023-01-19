@@ -102,9 +102,8 @@ function chainPromises(array, action) {
     acc.then((accRes) => (
       promise.then((res) => (
         action(accRes, res)
-      )).catch((error) => console.log(error))))
+      )).catch((error) => error)))
   ), Promise.resolve([]));
-  console.log(result);
   return result;
 }
 
