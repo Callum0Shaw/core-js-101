@@ -100,10 +100,8 @@ function getFastestPromise(array) {
 function chainPromises(array, action) {
   const result = array.reduce((acc, promise) => (
     acc.then((accRes) => (
-      promise.then((res) => (
-        action(accRes, res)
-      )).catch((error) => error)))
-  ), Promise.resolve([]));
+      promise.then((res) => [...accRes, res]).catch(() => accRes)))
+  ), Promise.resolve([])).then((res) => res.reduce(action));
   return result;
 }
 
